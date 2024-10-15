@@ -3,7 +3,7 @@ import { View, KeyboardAvoidingView, ScrollView, Text } from "react-native";
 import NoteTile from "./NoteTile.js"
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { dateString } from "./Functions.js"
-import RNFS from 'react-native-fs';
+// import RNFS from 'react-native-fs';
 
 export default function NoteSelector({setSelectedNoteData}){
     
@@ -30,8 +30,8 @@ export default function NoteSelector({setSelectedNoteData}){
             const dateTime = dateString();
             
             // Define the file path and name
-            const fileName = `New Note ${dateTime}.txt`;
-            const filePath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
+            // const fileName = `New Note ${dateTime}.txt`;
+            // const filePath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
             
             // Create the new note object with title and unique ID
             const newNote = {
@@ -39,11 +39,11 @@ export default function NoteSelector({setSelectedNoteData}){
                 title: `New Note ${dateTime}`,
                 content: "", // Empty content initially
                 lastUpdated: dateString(),
-                filePath: filePath, // Save the file path in the note's metadata
+                // filePath: filePath, // Save the file path in the note's metadata
             };
             
             // Create the new text file
-            await RNFS.writeFile(filePath, newNote.content, 'utf8');
+            // await RNFS.writeFile(filePath, newNote.content, 'utf8');
     
             // Retrieve the existing notes from AsyncStorage
             const storedNotes = await AsyncStorage.getItem('notes');

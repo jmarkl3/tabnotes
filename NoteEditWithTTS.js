@@ -10,7 +10,8 @@ import * as FileSystem from 'expo-file-system';
 // import * as RNFS from 'react-native-fs';
 // import RNFS from 'react-native-fs';
 import * as Clipboard from 'expo-clipboard';
-
+import * as Speech from 'expo-speech'; // TTS module from Expo
+ 
 const testNoteData = [
     {
         content: "Hello this is a line of text, Hello this is a line of text, Hello this is a line of text, Hello this is a line of text, Hello this is a line of text, Hello this is a line of text, Hello this is a line of text, Hello this is a line of text, Hello this is a line of text, Hello this is a line of text",
@@ -41,7 +42,7 @@ let emptyLine =   {
     content: "",
     open: true, 
 }
-export default function NoteEdit ({back, selectedNoteData}){
+export default function NoteEditWithTTS ({back, selectedNoteData}){
 
     const [data, setData] = useState([emptyLine])
     const [noteTitle, setNoteTitle] = useState("")
@@ -517,6 +518,79 @@ export default function NoteEdit ({back, selectedNoteData}){
 
     // #endregion 
 
+
+    // #region TTS
+
+    const isPlayingRef = useRef()
+    const speakingIndex = useRef(0)
+
+    function startTTS(){
+        // If its already running stop it
+        if(isPlayingRef.current){
+            pauseTTS() 
+        }
+        // Set the starting index and the playintRef flag variable
+        speakingIndex.current = 0
+        isPlayingRef.current = true
+
+        speakLine()
+
+    }
+    function startTTSFromCurrentRow(){
+        // If its already running stop it
+        if(isPlayingRef.current){
+            pauseTTS()
+        }
+
+        // Set the starting index and the playintRef flag variable
+        speakingIndex.current = selectedIndex
+        isPlayingRef.current = true
+        
+        speakLine()
+    }
+    function pauseTTS(){
+        isPlayingRef.current = false
+        Speech.pause()
+        Speech.stop()
+    }
+    function speakLine(){
+        let textToSpeak
+        if(speakingIndex.current > data.length)
+            speakingIndex = 0
+        
+        textToSpeak = data[speakingIndex.current].content
+        
+        speakText(textToSpeak)
+
+        // speakingIndex.current++
+
+    }
+
+    function speakText(textToSpeak = "hello"){
+
+        Speech.speak(textToSpeak, {
+            onDone: () => {
+                if (isPlayingRef.current) {
+                    // A 2 second timer between
+                    setTimeout(()=>{
+                        speakingIndex.current++;
+                        speakLine(); // Continue reading the next line
+                    },2000)
+                }
+            }
+        });
+        return
+
+
+        Speech.speak(textToSpeak, {
+            language: 'en',
+            pitch: 1.0,
+            rate: 1.0,
+          });
+
+
+    }
+    // #region TTS
     return (
         <View style={{marginTop: 40, flex: 1, backgroundColor: '#f4f4f4',}}>
             <KeyboardAvoidingView keyboardVerticalOffset={120} style={{marginBottom: 80, paddingBottom: 20}}>
@@ -547,7 +621,6 @@ export default function NoteEdit ({back, selectedNoteData}){
             </KeyboardAvoidingView>
             
             {/* Menu */}
-            {/* Menu */}
             {showMenu && 
                 <View 
                     style={{
@@ -570,6 +643,10 @@ export default function NoteEdit ({back, selectedNoteData}){
                     <Button onPress={openImporter}>Import From Text</Button>
                     <Button onPress={foldAll}>Fold All</Button>
                     <Button onPress={openAll}>Open All</Button>
+                    <Button onPress={()=>speakText()}>Speak</Button>
+                    <Button onPress={()=>startTTS()}>Start TTS (From Start)</Button>
+                    <Button onPress={()=>startTTSFromCurrentRow()}>Start TTS (From Current Line)</Button>
+                    <Button onPress={()=>pauseTTS()}>Pause TTS</Button>
                     <Button onPress={()=>setShowMenu()}>Close Menu</Button>
                 </View>
             }
@@ -600,7 +677,6 @@ export default function NoteEdit ({back, selectedNoteData}){
                     <Text style={styles.bottomButonText}>≡</Text>
                 </TouchableOpacity>
             </View>
-
             
             {showImporter && 
                 <View

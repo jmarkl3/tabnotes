@@ -50,7 +50,7 @@ const DataRow = forwardRef(({ dataObject, index, setSelectedIndex, viewingData, 
                     onChange={e => updateData(e.nativeEvent.text, index)}
                     // ref={ref} // Attach ref here
                 /> */}
-                <TextInputTimed
+                <TextInput
                     defaultValue={tabRemovedText(dataObject?.content)}
                                         // defaultValue={tabRemovedText(dataObject?.content)+" "+countLeadingTabs(dataObject?.content)}
                     // defaultValue={tabRemovedText(dataObject?.content)+" "+countLeadingTabs(dataObject?.content)+" "+index}
